@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">AndroidLab3</string>
+
+    <string name="btn_content_main_num_1">1</string>
+    <string name="btn_content_main_num_2">2</string>
+    <string name="btn_content_main_num_3">3</string>
+    <string name="btn_content_main_num_4">4</string>
+    <string name="btn_content_main_num_5">5</string>
+    <string name="btn_content_main_num_6">6</string>
+    <string name="btn_content_main_num_7">7</string>
+    <string name="btn_content_main_num_8">8</string>
+    <string name="btn_content_main_num_9">9</string>
+    <string name="btn_content_main_plus">+</string>
+    <string name="btn_content_main_minus">-</string>
+    <string name="btn_content_main_equals">=</string>
+    <string name="btn_content_main_change_theme">Change theme</string>
 </resources>
