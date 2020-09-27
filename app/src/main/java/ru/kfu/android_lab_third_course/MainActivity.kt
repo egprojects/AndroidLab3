@@ -1,5 +1,6 @@
 package ru.kfu.android_lab_third_course
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -14,13 +15,30 @@ class MainActivity : AppCompatActivity() {
     private lateinit var numbers: MutableList<Int>
     private lateinit var operations: MutableList<Operation>
 
+    companion object {
+        private const val APP_PREFERENCES = "preferences"
+        private const val APP_PREFERENCES_THEME = "theme"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val defaultNightMode = AppCompatDelegate.getDefaultNightMode()
+        val preferencedDefaultNightMode =
+            getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE).getInt(
+                APP_PREFERENCES_THEME, defaultNightMode
+            )
+        if (defaultNightMode != preferencedDefaultNightMode) {
+            changeTheme(preferencedDefaultNightMode)
+        }
+
         setContentView(R.layout.activity_main)
 
-        expression = savedInstanceState?.getString("expression", "") ?: ""
-        numbers = savedInstanceState?.getIntArray("numbers")?.toMutableList() ?: mutableListOf()
-        operations = savedInstanceState?.getIntArray("operations")?.map { Operation.values()[it] }
+        expression = savedInstanceState?.getString("expression") ?: ""
+        numbers = savedInstanceState?.getIntArray("numbers")
+            ?.toMutableList() ?: mutableListOf()
+        operations = savedInstanceState?.getIntArray("operations")
+            ?.map { Operation.values()[it] }
             ?.toMutableList() ?: mutableListOf()
         if (numbers.size != 0) {
             tv_main_expression.text = expression
@@ -100,10 +118,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onChangeThemeClicked(view: View) {
-        if (AppCompatDelegate.getDefaultNightMode() == MODE_NIGHT_YES) {
-            AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_NO)
-        } else {
-            AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES)
-        }
+        changeTheme(
+            if (AppCompatDelegate.getDefaultNightMode() == MODE_NIGHT_YES) {
+                MODE_NIGHT_NO
+            } else {
+                MODE_NIGHT_YES
+            }
+        )
+    }
+
+    private fun changeTheme(defaultNightMode: Int) {
+        AppCompatDelegate.setDefaultNightMode(defaultNightMode)
+        getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE)
+            .edit()
+            .putInt(APP_PREFERENCES_THEME, defaultNightMode)
+            .apply()
     }
 }
