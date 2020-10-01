@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        hideLoading()
         when (requestCode) {
             LOAD_PAYMENT_DATA_REQUEST_CODE ->
                 when (resultCode) {
@@ -40,7 +41,6 @@ class MainActivity : AppCompatActivity() {
                             val tokenJSON = paymentData?.paymentMethodToken?.token
                             showResult(tokenJSON.toString())
                         }
-                    Activity.RESULT_CANCELED -> hideLoading()
                     AutoResolveHelper.RESULT_ERROR -> showResult("Error")
                     else -> {
                     }
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun payWithGooglePay() {
-        val request = GooglePayHelper.createPaymentDataRequest(0.0)
+        val request = GooglePayHelper.createPaymentDataRequest("0,0")
         paymentsClient.let {
             showLoading()
             AutoResolveHelper.resolveTask(

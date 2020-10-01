@@ -41,7 +41,7 @@ class GooglePayHelper {
             return client.isReadyToPay(request)
         }
 
-        fun createPaymentDataRequest(price: Double): PaymentDataRequest {
+        fun createPaymentDataRequest(price: String): PaymentDataRequest {
             val request = PaymentDataRequest.newBuilder()
                 .setTransactionInfo(getTransactionInfo(price))
                 .addAllowedPaymentMethods(supportedPaymentMethods)
@@ -55,16 +55,18 @@ class GooglePayHelper {
             return request.build()
         }
 
-        private fun getTransactionInfo(price: Double) =
+        private fun getTransactionInfo(price: String) =
             TransactionInfo.newBuilder()
                 .setTotalPriceStatus(WalletConstants.TOTAL_PRICE_STATUS_FINAL)
-                .setTotalPrice(price.toString())
+                .setTotalPrice(price)
                 .setCurrencyCode("USD")
                 .build()
 
         private fun createTokenizationParameters(): PaymentMethodTokenizationParameters =
             PaymentMethodTokenizationParameters.newBuilder()
                 .setPaymentMethodTokenizationType(WalletConstants.PAYMENT_METHOD_TOKENIZATION_TYPE_PAYMENT_GATEWAY)
+                .addParameter("gateway", "stripe")
+                .addParameter("stripe:publishableKey", "Smth")
                 .build()
 
     }
