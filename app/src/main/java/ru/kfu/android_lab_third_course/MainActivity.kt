@@ -5,11 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.wallet.AutoResolveHelper
-import com.google.android.gms.wallet.PaymentData
-import com.google.android.gms.wallet.PaymentsClient
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.wallet.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.buy_with_googlepay_button.*
+import org.json.JSONObject
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var paymentsClient: PaymentsClient
@@ -22,8 +23,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        paymentsClient = GooglePayHelper.createPaymentsClient(this)
-        GooglePayHelper.isReadyToPay(paymentsClient).addOnSuccessListener {
+        paymentsClient = GooglePayHelper.createPaymentsClient(this)!!
+
+        val isReadyToPayJson: JSONObject? = GooglePayHelper.getIsReadyToPayRequest()
+        if (isReadyToPayJson == null) {
+            return
+        }
+        val request = IsReadyToPayRequest.fromJson(isReadyToPayJson.toString()) ?: return
+
+        val task: Task<Boolean> = paymentsClient.isReadyToPay(request)
+        task.addOnSuccessListener {
             buy_with_google_button.isClickable = true
             buy_with_google_button.setOnClickListener { payWithGooglePay() }
         }
@@ -49,13 +58,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun payWithGooglePay() {
-        val request = GooglePayHelper.createPaymentDataRequest("0,0")
-        paymentsClient.let {
-            showLoading()
+        showLoading()
+
+        val paymentDataRequestJson: JSONObject? = GooglePayHelper.getPaymentDataRequest("0.0")
+        if (paymentDataRequestJson == null) {
+            return
+        }
+        val request = PaymentDataRequest.fromJson(paymentDataRequestJson.toString())
+
+        if (request != null) {
             AutoResolveHelper.resolveTask(
-                it.loadPaymentData(request),
-                this,
-                LOAD_PAYMENT_DATA_REQUEST_CODE
+                paymentsClient.loadPaymentData(request), this, LOAD_PAYMENT_DATA_REQUEST_CODE
             )
         }
     }
@@ -70,5 +83,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun showResult(result: String) {
         tv_main_result.text = result
+        tv_main_result.visibility = View.VISIBLE
     }
 }
