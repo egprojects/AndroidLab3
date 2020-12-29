@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">AndroidLab3</string>
+    <string name="plus">+</string>
+    <string name="equals">=</string>
 </resources>
